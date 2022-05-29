@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { ReqResponse } from '../schemas/response';
+import { ReqResponse } from '../dto/response.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { UpdatePassDto } from '../dto/update-pass.dto';
@@ -42,14 +42,13 @@ export class UsersService {
     const newPassword = await this.hashPassword(user.password);
     user.password = newPassword;
     Logger.log('*****************************************');
-    const newUser: User = await this.userRepository.save(user);
+    await this.userRepository.save(user);
     // delete newUser.password;
     const resp: ReqResponse = {
       status: 200,
       success: true,
       message: 'User created successfully',
       error: false,
-      data: newUser,
     };
     return resp;
   }
@@ -69,7 +68,6 @@ export class UsersService {
         success: true,
         message: 'User updated successfully',
         error: false,
-        data: null,
       };
       return resp;
     } else {
@@ -86,7 +84,6 @@ export class UsersService {
         success: true,
         message: 'User deleted successfully',
         error: false,
-        data: null,
       };
       return resp;
     } else {
@@ -102,7 +99,7 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { name: name } });
   }
 
-  async hashPassword(password: string) {
+  private async hashPassword(password: string) {
     try {
       password = await bcrypt.hash(password, 8);
       return password;
@@ -122,7 +119,7 @@ export class UsersService {
     }
   }
 
-  async findById(id: number) {
+  private async findById(id: number) {
     return await this.userRepository.findOne({ where: { id: id } });
   }
 

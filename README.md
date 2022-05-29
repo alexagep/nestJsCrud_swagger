@@ -24,8 +24,7 @@
 
 ## Description
 
-Crud using NestJS + JWT + MySql + TypeORM
-
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
 

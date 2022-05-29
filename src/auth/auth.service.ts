@@ -67,4 +67,21 @@ export class AuthService {
       throw new UnauthorizedException();
     }
   }
+
+  async login___(authLoginDto: AuthLoginDto): Promise<any> {
+    const { email, password } = authLoginDto;
+    Logger.log(
+      '**************',
+      authLoginDto.email,
+      '*************',
+      authLoginDto.password,
+    );
+    const collectUser = await this.usersService.findUserByEmail(email);
+    const payload = { email, password, id: collectUser.id };
+    Logger.log('payload_****************', payload);
+
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
 }

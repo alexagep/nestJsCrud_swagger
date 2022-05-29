@@ -8,22 +8,26 @@ import {
   Post,
   Put,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UsersService } from './users.service';
 import { User } from '../entities/user.entity';
-import { ReqResponse } from '../schemas/response';
+import { ReqResponse } from '../dto/response.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { BenchmarkInterceptor } from '../interceptors/benchmark.interceptor';
 
 @ApiTags('users')
 @Controller('users')
+@UseInterceptors(BenchmarkInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -57,6 +61,7 @@ export class UsersController {
 
   @ApiBearerAuth('access-token') //edit here
   @ApiCreatedResponse({ type: CreateUserDto, description: 'Update An User' })
+  @ApiNotFoundResponse()
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   async updateUser(

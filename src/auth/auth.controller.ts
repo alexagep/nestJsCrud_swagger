@@ -45,4 +45,17 @@ export class AuthController {
   async login(@Body() authLoginDto: AuthLoginDto) {
     return await this.authService.login(authLoginDto);
   }
+
+  @Post('register')
+  async register(@Body() authLoginDto: AuthLoginDto) {
+    return await this.authService.login___(authLoginDto);
+  }
+
+
+  @Post('logout')
+  logout() {
+    return {
+      message: 'Logout successfully',
+    };
+  }
 }
