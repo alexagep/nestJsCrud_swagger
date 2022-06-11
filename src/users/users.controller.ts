@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UsersService } from './users.service';
-import { User } from '../entities/user.entity';
+import { Users } from '../entities/users.entity';
 import { ReqResponse } from '../dto/response.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -24,9 +24,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BenchmarkInterceptor } from '../interceptors/benchmark.interceptor';
+import { Roles } from '../roles.decorator';
+import { RolesGuard } from '../roles.guard';
 
 @ApiTags('users')
 @Controller('users')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @UseInterceptors(BenchmarkInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -37,7 +40,8 @@ export class UsersController {
     description: 'Get All Users',
   })
   @Get()
-  async getUsers(): Promise<User[]> {
+  @Roles('admin')
+  async getUsers(): Promise<Users[]> {
     return await this.usersService.findAll();
   }
 
@@ -47,22 +51,21 @@ export class UsersController {
     isArray: false,
     description: 'Get An User',
   })
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
+  @Roles('admin', 'user')
+  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<Users> {
     return await this.usersService.findOneById(id);
   }
 
   @ApiCreatedResponse({ type: CreateUserDto, description: 'Create An User' })
   @Post()
-  async createUser(@Body() user: CreateUserDto): Promise<ReqResponse> {
+  async createUser(@Body() user: Users): Promise<ReqResponse> {
     return await this.usersService.createUser(user);
   }
 
   @ApiBearerAuth('access-token') //edit here
   @ApiCreatedResponse({ type: CreateUserDto, description: 'Update An User' })
   @ApiNotFoundResponse()
-  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async updateUser(
     @Body() user: UpdateUserDto,
@@ -73,7 +76,6 @@ export class UsersController {
 
   @ApiBearerAuth('access-token') //edit here
   @ApiCreatedResponse({ type: CreateUserDto, description: 'Delete An User' })
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteUser(
     @Param('id', ParseIntPipe) id: number,

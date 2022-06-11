@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { Users } from '../entities/users.entity';
 import { ReqResponse } from '../dto/response.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
@@ -18,34 +18,36 @@ import { Request } from 'express';
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Users)
+    private readonly userRepository: Repository<Users>,
     @Inject(REQUEST)
     private readonly request: Request,
   ) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<Users[]> {
     return await this.userRepository.find();
   }
 
-  async findOneById(id: number): Promise<User> {
+  async findOneById(id: number): Promise<Users> {
     const user: any = this.request.user;
     if (user.id === id) {
-      return await this.userRepository.findOne({ where: { id: id } });
+      const user = await this.userRepository.findOne({ where: { id: id } });
+      delete user.password;
+      return user;
     } else {
       Logger.log(this.request.user);
       throw new UnauthorizedException();
     }
   }
 
-  async createUser(user: User): Promise<ReqResponse> {
+  async createUser(user: Users): Promise<ReqResponse> {
     const newPassword = await this.hashPassword(user.password);
     user.password = newPassword;
     Logger.log('*****************************************');
     await this.userRepository.save(user);
     // delete newUser.password;
     const resp: ReqResponse = {
-      status: 200,
+      status: 201,
       success: true,
       message: 'User created successfully',
       error: false,
@@ -95,7 +97,7 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
-  async validateUser(name: string): Promise<User> {
+  async validateUser(name: string): Promise<Users> {
     return await this.userRepository.findOne({ where: { name: name } });
   }
 
@@ -123,7 +125,7 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { id: id } });
   }
 
-  async updatePassword(id: number, data: UpdatePassDto): Promise<User> {
+  async updatePassword(id: number, data: UpdatePassDto): Promise<Users> {
     const user = await this.findById(id);
     if (user) {
       user.password = await this.hashPassword(data.password);

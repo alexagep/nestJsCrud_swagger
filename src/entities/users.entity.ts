@@ -11,7 +11,7 @@ import {
 import { Post } from './post.entity';
 
 @Entity()
-export class User {
+export class Users {
   @PrimaryGeneratedColumn()
   id?: number;
 
@@ -39,9 +39,8 @@ export class User {
   @ApiProperty()
   age: number;
 
-  // @Column('text', { default: null, array: true })
   @OneToMany(() => Post, (post) => post.author)
-  posts?: Post[];
+  posts: Post[];
 
   @Column({ default: null })
   @CreateDateColumn()

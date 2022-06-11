@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { AuthLoginDto } from '../dto/auth-login.dto';
-import { User } from '../entities/user.entity';
+import { Users } from '../entities/users.entity';
 import { REQUEST } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { UpdatePassDto } from '../dto/update-pass.dto';
@@ -32,7 +32,12 @@ export class AuthService {
 
     if (user) {
       const collectUser = await this.usersService.findUserByEmail(email);
-      const payload = { email, password, id: collectUser.id };
+      const payload = {
+        email,
+        password,
+        id: collectUser.id,
+        role: collectUser.role,
+      };
       Logger.log('payload_****************', payload);
 
       return {
@@ -43,7 +48,7 @@ export class AuthService {
     }
   }
 
-  async updatePassword(id: number, data: UpdatePassDto): Promise<User> {
+  async updatePassword(id: number, data: UpdatePassDto): Promise<Users> {
     const user = this.request.user;
     Logger.log('typeof_user_****************', typeof user.id, typeof id);
     if (user.id === id && data.password === data.rePassword) {
@@ -56,7 +61,7 @@ export class AuthService {
     // return await this.usersService.updatePassword(id, data);
   }
 
-  async validateUser(authLoginDto: AuthLoginDto): Promise<User> {
+  async validateUser(authLoginDto: AuthLoginDto): Promise<Users> {
     const { email, password } = authLoginDto;
 
     const user = await this.usersService.findUserByEmail(email);

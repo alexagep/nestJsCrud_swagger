@@ -1,11 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { UserRoles } from '../model/userRoles';
 import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Post } from '../entities/post.entity';
 
 export class UpdateUserDto {
   id?: number;
 
-  password: string;
+  password?: string;
 
   @IsOptional()
   @IsString()
@@ -18,6 +20,13 @@ export class UpdateUserDto {
   age?: number;
 
   @IsOptional()
+  posts: Post[];
+
+  @IsOptional()
+  @ApiProperty()
+  role: UserRoles;
+
+  @IsOptional()
   @IsString()
   @ApiProperty({ required: false })
   mobile?: string;
@@ -28,8 +37,8 @@ export class UpdateUserDto {
   email?: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt?: Date;
 }

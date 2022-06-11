@@ -251,12 +251,12 @@
 import { UsersService } from &#x27;./users.service&#x27;;
 import { UsersController } from &#x27;./users.controller&#x27;;
 import { TypeOrmModule } from &#x27;@nestjs/typeorm&#x27;;
-import { User } from &#x27;../entities/user.entity&#x27;;
+import { Users } from &#x27;../entities/user.entity&#x27;;
 import { AuditMiddleware } from &#x27;../middleware/audit.middleware&#x27;;
 
 @Module({
   //This module uses the forFeature() method to define which repositories are registered in the current scope
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([Users])],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService],

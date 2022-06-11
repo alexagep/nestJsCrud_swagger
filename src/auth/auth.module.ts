@@ -21,6 +21,7 @@ import { ValidUserMiddleware } from '../middleware/auth.middleware';
       imports: [ConfigModule],
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
+        signOptions: { expiresIn: '1d' },
       }),
       inject: [ConfigService],
     }),
